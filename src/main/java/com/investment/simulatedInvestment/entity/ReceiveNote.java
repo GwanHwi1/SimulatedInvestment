@@ -12,6 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class ReceiveNote {
+
     @Id
     @Column(name = "receive_note_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

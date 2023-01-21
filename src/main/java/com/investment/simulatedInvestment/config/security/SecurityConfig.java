@@ -59,7 +59,7 @@ public class SecurityConfig {
         http.csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/", "/h2-console/**")
+                .antMatchers("/")
                 .permitAll()
                 .antMatchers(HttpMethod.DELETE)
                 .hasRole(Role.ADMIN.toString())
@@ -85,7 +85,7 @@ public class SecurityConfig {
         return (web) -> web
                 .debug(securityDebug)
                 .ignoring()
-                .antMatchers("/css/**", "/js/**", "/img/**", "/lib/**", "/favicon.ico");
+                .antMatchers("/css/**", "/js/**", "/img/**", "/lib/**", "/favicon.ico", "/h2-console/**");
     }
 
 
