@@ -1,6 +1,8 @@
 package com.investment.simulatedInvestment.config.security;
 
 import com.investment.simulatedInvestment.common.Role;
+import com.investment.simulatedInvestment.handler.CustomAccessDeniedHandler;
+import com.investment.simulatedInvestment.handler.CustomAuthenticationEntryPoint;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -15,7 +17,9 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 
 @EnableWebSecurity
@@ -45,8 +49,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http, BCryptPasswordEncoder bCryptPasswordEncoder, UserDetailsService userDetailsService)
-            throws Exception {
+    public AuthenticationManager authenticationManager(HttpSecurity http,
+                                                       BCryptPasswordEncoder bCryptPasswordEncoder,
+                                                       UserDetailsService userDetailsService
+    ) throws Exception {
+
         return http.getSharedObject(AuthenticationManagerBuilder.class)
                 .userDetailsService(userDetailsService)
                 .passwordEncoder(bCryptPasswordEncoder)
@@ -77,6 +84,10 @@ public class SecurityConfig {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
+        http.exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPoint())
+                .accessDeniedHandler(accessDeniedHandler());
+
         return http.build();
     }
 
@@ -85,8 +96,17 @@ public class SecurityConfig {
         return (web) -> web
                 .debug(securityDebug)
                 .ignoring()
-                .antMatchers("/css/**", "/js/**", "/img/**", "/lib/**", "/favicon.ico", "/h2-console/**");
+                .antMatchers("/css/**", "/js/**", "/img/**",
+                        "/lib/**", "/favicon.ico", "/h2-console/**","/errorPage");
     }
 
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return new CustomAuthenticationEntryPoint();
+    }
 
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new CustomAccessDeniedHandler();
+    }
 }
