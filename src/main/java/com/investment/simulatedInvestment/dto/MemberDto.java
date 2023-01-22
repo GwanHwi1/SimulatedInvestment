@@ -27,6 +27,10 @@ public class MemberDto {
         this.role = role;
     }
 
+    public MemberDto() {
+
+    }
+
     public Member toEntity() {
         return Member.builder()
                 .username(username)

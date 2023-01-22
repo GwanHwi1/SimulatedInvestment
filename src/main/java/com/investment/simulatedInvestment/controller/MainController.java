@@ -4,10 +4,10 @@ import com.investment.simulatedInvestment.dto.MemberDto;
 import com.investment.simulatedInvestment.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @Controller
 @RequiredArgsConstructor
@@ -16,17 +16,19 @@ public class MainController {
     private final MemberService memberService;
 
     @GetMapping("/")
-    public String index() {
+    public String createMemberForm(Model model){
+        model.addAttribute("memberForm", new MemberDto());
         return "index";
     }
 
     @PostMapping("/")
-    public String createUser(@RequestBody MemberDto form, BindingResult result) {
-        if (result.hasErrors()) {
-            return "redirect:/";
+    public String createMember(MemberDto form, BindingResult result){
+        if(result.hasErrors()){
+            return "index";
         }
         memberService.createUser(form);
 
         return "redirect:/";
     }
+
 }

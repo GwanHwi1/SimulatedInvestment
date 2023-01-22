@@ -1,6 +1,6 @@
 package com.investment.simulatedInvestment.entity;
 
-import com.investment.simulatedInvestment.common.BaseTime;
+
 import com.investment.simulatedInvestment.common.Role;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -11,10 +11,10 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
-public class Member extends BaseTime {
+public class Member {
 
     @Id
     @Column(name = "member_id", nullable = false)

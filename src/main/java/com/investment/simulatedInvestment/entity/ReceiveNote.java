@@ -7,12 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class ReceiveNote {
-
     @Id
     @Column(name = "receive_note_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
