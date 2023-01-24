@@ -27,6 +27,14 @@ public class MemberDto {
         this.role = role;
     }
 
+    @Builder
+    public MemberDto(Member member) {
+        this.username = member.getUsername();
+        this.nickname = member.getNickname();
+        this.password = member.getPassword();
+        this.role = member.getRole();
+    }
+
     public Member toEntity() {
         return Member.builder()
                 .username(username)
