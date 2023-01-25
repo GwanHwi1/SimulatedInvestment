@@ -96,7 +96,7 @@ public class SecurityConfig {
         http.oauth2Login()
                 .loginPage("/")
                 .userInfoEndpoint()
-                .userService(oauth());
+                .userService(customOAuth2UserService());
 
 
         return http.build();
@@ -122,7 +122,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CustomOAuth2UserService oauth() {
+    public CustomOAuth2UserService customOAuth2UserService() {
         return new CustomOAuth2UserService(memberRepository, bCryptPasswordEncoder());
     }
 }
