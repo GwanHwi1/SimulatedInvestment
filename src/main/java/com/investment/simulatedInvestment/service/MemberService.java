@@ -1,12 +1,9 @@
 package com.investment.simulatedInvestment.service;
 
-import com.investment.simulatedInvestment.common.Role;
 import com.investment.simulatedInvestment.dto.MemberDto;
 import com.investment.simulatedInvestment.entity.Member;
 import com.investment.simulatedInvestment.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,9 +17,11 @@ public class MemberService {
 //    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Transactional
-    public Long createUser(MemberDto dto){
+    public Long createUser(MemberDto dto) {
         Member member = dto.toEntity();
         memberRepository.save(member);
         return member.getId();
     }
+
+
 }
