@@ -40,7 +40,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         Member member = memberRepository.findByUsername(username)
                 .orElse(createOAuth2User(oAuth2User));
 
-        return memberToMemberDto(member);
+        return toDto(member);
     }
 
     public Member createOAuth2User(OAuth2User oAuth2User) {
@@ -56,7 +56,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         return memberRepository.save(member);
     }
 
-    private MemberDto memberToMemberDto(Member member) {
+    private MemberDto toDto(Member member) {
         return MemberDto.builder()
                 .username(member.getUsername())
                 .nickname(member.getNickname())
