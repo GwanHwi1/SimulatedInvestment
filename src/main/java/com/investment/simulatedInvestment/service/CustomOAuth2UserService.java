@@ -6,7 +6,6 @@ import com.investment.simulatedInvestment.dto.MemberDto;
 import com.investment.simulatedInvestment.entity.Member;
 import com.investment.simulatedInvestment.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -21,8 +20,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     private final MemberRepository memberRepository;
 
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
     @Transactional
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -30,6 +27,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuth2User oAuth2User = delegate.loadUser(userRequest);
 
         MemberDto memberDto = findByOAuth2User(oAuth2User);
+        System.out.println("userRequest clientRegistration : " + userRequest.getClientRegistration());
+        // token을 통해 응답받은 회원정보
+        System.out.println("oAuth2User : " + oAuth2User);
 
         return new CustomUserDetails(memberDto, oAuth2User.getAttributes());
     }
@@ -48,7 +48,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         Member member = MemberDto.builder()
                 .username(oAuth2User.getAttribute("email"))
                 .nickname(oAuth2User.getAttribute("name"))
-                .password(bCryptPasswordEncoder.encode("비밀번호 뭐로하지?"))
+                .password("비밀번호 뭐로하지?")
                 .role(Role.USER)
                 .build()
                 .toEntity();
@@ -64,4 +64,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 .role(member.getRole())
                 .build();
     }
+
+
 }

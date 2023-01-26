@@ -3,12 +3,10 @@ package com.investment.simulatedInvestment.config.security;
 import com.investment.simulatedInvestment.common.Role;
 import com.investment.simulatedInvestment.handler.CustomAccessDeniedHandler;
 import com.investment.simulatedInvestment.handler.CustomAuthenticationEntryPoint;
-import com.investment.simulatedInvestment.repository.MemberRepository;
 import com.investment.simulatedInvestment.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -29,7 +27,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
-    private final MemberRepository memberRepository;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Value("${spring.security.debug:false}")
     boolean securityDebug;
@@ -68,35 +66,17 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf()
-                .disable()
-                .authorizeRequests()
-                .antMatchers("/")
-                .permitAll()
-                .antMatchers(HttpMethod.DELETE)
-                .hasRole(Role.ADMIN.toString())
-                .antMatchers("/admin/**")
-                .hasAnyRole(Role.ADMIN.toString())
-                .antMatchers("/user/**")
-                .hasAnyRole(Role.USER.toString(), Role.ADMIN.toString())
-                .antMatchers("/login/**")
-                .anonymous()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .httpBasic()
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.httpBasic().disable()
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
-        http.exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint())
-                .accessDeniedHandler(accessDeniedHandler());
+                .and()
+                .logout()
+                .logoutUrl("/")
 
-        http.oauth2Login()
-                .loginPage("/")
-                .userInfoEndpoint()
-                .userService(customOAuth2UserService());
+                .and()
+                .oauth2Login().loginPage("/")
+                .userInfoEndpoint().userService(customOAuth2UserService);
 
 
         return http.build();
@@ -121,8 +101,4 @@ public class SecurityConfig {
         return new CustomAccessDeniedHandler();
     }
 
-    @Bean
-    public CustomOAuth2UserService customOAuth2UserService() {
-        return new CustomOAuth2UserService(memberRepository, bCryptPasswordEncoder());
-    }
 }
