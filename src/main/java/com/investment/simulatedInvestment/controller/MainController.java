@@ -26,7 +26,6 @@ public class MainController {
 
     @GetMapping("/")
     public String createMemberForm(){
-        System.out.println("zzzzzzzzzzzzzzzzzzzz");
 
         return "index";
     }
@@ -37,8 +36,6 @@ public class MainController {
 //        if(result.hasErrors()){
 //            return "index";
 //        }
-        System.out.println("aaaaaaaaaaaaaaaaaaaaa");
-        System.out.println(form);
         memberService.createUser(form);
 
 

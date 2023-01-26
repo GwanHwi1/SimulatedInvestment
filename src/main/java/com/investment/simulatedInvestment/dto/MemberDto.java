@@ -2,10 +2,7 @@ package com.investment.simulatedInvestment.dto;
 
 import com.investment.simulatedInvestment.common.Role;
 import com.investment.simulatedInvestment.entity.Member;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Setter;
+import lombok.*;
 
 @Data
 @Setter(AccessLevel.NONE)
