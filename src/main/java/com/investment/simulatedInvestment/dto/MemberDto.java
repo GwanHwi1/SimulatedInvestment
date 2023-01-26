@@ -2,18 +2,14 @@ package com.investment.simulatedInvestment.dto;
 
 import com.investment.simulatedInvestment.common.Role;
 import com.investment.simulatedInvestment.entity.Member;
-import lombok.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import java.beans.Encoder;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Setter;
 
 @Data
 @Setter(AccessLevel.NONE)
 public class MemberDto {
-
-//    @Autowired
-//    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private String username;
 
@@ -30,14 +26,6 @@ public class MemberDto {
         this.password = password;
         this.role = role;
     }
-//bCryptPasswordEncoder.encode(password)
-//    @Builder
-//    public MemberDto(Member member) {
-//        this.username = member.getUsername();
-//        this.nickname = member.getNickname();
-//        this.password = member.getPassword();
-//        this.role = member.getRole();
-//    }
 
     public Member toEntity() {
         return Member.builder()
