@@ -26,7 +26,6 @@ public class MemberService {
                 .password(bCryptPasswordEncoder.encode(dto.getPassword()))
                 .role(Role.USER)
                 .build();
-        System.out.println(encoding);
-        return  memberRepository.save(encoding);
+        return memberRepository.save(encoding);
     }
 }

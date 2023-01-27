@@ -1,11 +1,13 @@
 package com.investment.simulatedInvestment.controller;
 
 import ch.qos.logback.core.net.SyslogOutputStream;
+import com.investment.simulatedInvestment.config.security.CustomUserDetails;
 import com.investment.simulatedInvestment.dto.MemberDto;
 import com.investment.simulatedInvestment.entity.Member;
 import com.investment.simulatedInvestment.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,16 +32,23 @@ public class MainController {
     public String loginMember(){
         return "loginForm";
     }
+
     @GetMapping("/joinForm")
     public String joinForm() {
         return "index";
     }
+
     @PostMapping("/join")
     public String createMember(@ModelAttribute MemberDto form){
-        System.out.println("lllllllllllllllllllllllllllll");
-        System.out.println(form);
         memberService.createUser(form);
         return "redirect:/";
+    }
+
+    @GetMapping("/user")
+    public String user(Authentication authentication){
+        CustomUserDetails custom =(CustomUserDetails) authentication.getPrincipal();
+        System.out.println("authentication: "+ custom.getUsername());
+        return "user";
     }
 
 }

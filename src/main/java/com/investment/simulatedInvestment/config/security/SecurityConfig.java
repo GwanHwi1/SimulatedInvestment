@@ -2,6 +2,7 @@ package com.investment.simulatedInvestment.config.security;
 
 import com.investment.simulatedInvestment.common.Role;
 import com.investment.simulatedInvestment.config.security.jwt.JwtAuthenticationFilter;
+import com.investment.simulatedInvestment.config.security.jwt.JwtAuthorizationFilter;
 import com.investment.simulatedInvestment.handler.CustomAccessDeniedHandler;
 import com.investment.simulatedInvestment.handler.CustomAuthenticationEntryPoint;
 import com.investment.simulatedInvestment.repository.MemberRepository;
@@ -40,6 +41,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
     private final CorsFilter corsFilter;
 
+    private final MemberRepository memberRepository;
+
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
@@ -56,12 +59,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                 .formLogin().disable()
                 .httpBasic().disable()
                 .addFilter(new JwtAuthenticationFilter(authenticationManager()))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberRepository))
                 .authorizeRequests()
                 .antMatchers("/user/**")
                 .access("hasRole('USER') or hasRole('ADMIN')")
                 .antMatchers("/admin/**")
                 .access("hasRole('ADMIN')")
-                .anyRequest().permitAll();
+                .anyRequest().permitAll()
+                .and()
+                .oauth2Login()
+                .loginPage("/loginForm")
+                .userInfoEndpoint()
+                .userService(customOAuth2UserService);
 
     }
 
