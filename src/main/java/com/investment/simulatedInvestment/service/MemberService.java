@@ -20,13 +20,13 @@ public class MemberService {
 
     @Transactional
     public Member createUser(MemberDto dto) {
-        MemberDto encoding = MemberDto.builder()
+        Member encoding = Member.builder()
                 .username(dto.getUsername())
                 .nickname(dto.getNickname())
                 .password(bCryptPasswordEncoder.encode(dto.getPassword()))
-                .role(dto.getRole())
+                .role(Role.USER)
                 .build();
-        Member member = encoding.toEntity();
-        return  memberRepository.save(member);
+        System.out.println(encoding);
+        return  memberRepository.save(encoding);
     }
 }
