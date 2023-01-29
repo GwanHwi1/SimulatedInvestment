@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private MemberRepository memberRepository;
@@ -32,27 +31,28 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        System.out.println("인증이나 권한이 필요한 주소 요청이 됨.");
 
-        String jwtHeader = request.getHeader("Authorization");
-        System.out.println("jwtHeader: " + jwtHeader);
+        String jwtHeader = request.getHeader(JwtProperties.HEADER_STRING);
 
 
-        if(jwtHeader == null || !jwtHeader.startsWith("Bearer")){
+        if(jwtHeader == null || !jwtHeader.startsWith(JwtProperties.TOKEN_PREFIX)){
             chain.doFilter(request, response);
             return;
         }
 
-        String jwtToken = request.getHeader("Authorization").replace("Bearer ", "");
+        System.out.println("jwtHeader: " + jwtHeader);
+
+        String jwtToken = request.getHeader(JwtProperties.HEADER_STRING).replace(JwtProperties.TOKEN_PREFIX, "");
 
         String username =
-                JWT.require(Algorithm.HMAC512("Gwan")).build().verify(jwtToken).getClaim("username").asString();
+                JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(jwtToken).getClaim("username").asString();
 
         if(username != null) {
             System.out.println("username 정상");
             Member userEntity = memberRepository.findByUsername(username).orElse(null);
 
             System.out.println("userEntity: " + userEntity.getUsername());
+            System.out.println("Role: "+userEntity.getRole().toString());
             MemberDto dto = MemberDto.builder()
                     .username(userEntity.getUsername())
                     .nickname(userEntity.getNickname())

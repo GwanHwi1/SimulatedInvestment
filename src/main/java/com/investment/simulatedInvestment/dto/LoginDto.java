@@ -7,6 +7,8 @@ import lombok.Setter;
 @Data
 @Setter(AccessLevel.NONE)
 public class LoginDto {
+
     private String username;
     private String password;
+
 }

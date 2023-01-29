@@ -1,7 +1,7 @@
 package com.investment.simulatedInvestment.common;
 
 public enum Role {
-    USER("user"),ADMIN("admin");
+    USER("ROLE_USER"),ADMIN("ROLE_ADMIN");
 
     private final String role;
 

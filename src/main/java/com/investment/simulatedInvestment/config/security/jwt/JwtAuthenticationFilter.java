@@ -6,7 +6,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.investment.simulatedInvestment.config.security.CustomUserDetails;
 import com.investment.simulatedInvestment.dto.LoginDto;
-import com.investment.simulatedInvestment.entity.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,21 +35,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         try {
             loginDto = om.readValue(request.getInputStream(), LoginDto.class);
-
-//            UsernamePasswordAuthenticationToken authenticationToken =
-//                    new UsernamePasswordAuthenticationToken(member.getUsername(), member.getPassword());
-
-//            Authentication authentication =
-//                    authenticationManager.authenticate(authenticationToken);
-//
-//            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-//            System.out.println("로그인 완료됨 ?:" + customUserDetails.getUsername());
-
-//            return authentication;
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        return null;
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(
                         loginDto.getUsername(),
@@ -59,8 +46,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Authentication authentication =
                 authenticationManager.authenticate(authenticationToken);
 
-        CustomUserDetails principalDetailis = (CustomUserDetails) authentication.getPrincipal();
-        System.out.println("Authentication : "+principalDetailis.getUser().getUsername());
+        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+        System.out.println("Authentication : "+customUserDetails.getUser().getUsername());
         return authentication;
     }
 
@@ -69,15 +56,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             Authentication authResult) throws IOException, ServletException {
         System.out.println("successfulAuthentication 실행됨: 인증이 완료");
         CustomUserDetails customUserDetails = (CustomUserDetails) authResult.getPrincipal();
-        System.out.println(customUserDetails);
 
         String jwtToken = JWT.create()
                 .withSubject(customUserDetails.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis()+(60000*10))) //만료시간 10분
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME)) //만료시간 10분
                 .withClaim("username", customUserDetails.getUser().getUsername())
                 .withClaim("nickname", customUserDetails.getUser().getNickname())
-                .sign(Algorithm.HMAC512("Gwan"));
-        response.addHeader("Authorization", "Bearer " + jwtToken);
+                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
+        response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + jwtToken);
         System.out.println("토큰 생성 완료");
     }
 }
