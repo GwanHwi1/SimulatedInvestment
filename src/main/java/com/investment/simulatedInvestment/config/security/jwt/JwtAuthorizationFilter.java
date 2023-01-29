@@ -32,8 +32,11 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
+        System.out.println("인증이나 권한이 필요한 주소 요청이 됨.");
 
         String jwtHeader = request.getHeader("Authorization");
+        System.out.println("jwtHeader: " + jwtHeader);
+
 
         if(jwtHeader == null || !jwtHeader.startsWith("Bearer")){
             chain.doFilter(request, response);
@@ -49,7 +52,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             System.out.println("username 정상");
             Member userEntity = memberRepository.findByUsername(username).orElse(null);
 
-            System.out.println("userEntity: "+ userEntity.getUsername());
+            System.out.println("userEntity: " + userEntity.getUsername());
             MemberDto dto = MemberDto.builder()
                     .username(userEntity.getUsername())
                     .nickname(userEntity.getNickname())
@@ -65,8 +68,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             System.out.println("==============================================================");
-
-            chain.doFilter(request, response);
         }
+
+        chain.doFilter(request, response);
     }
 }

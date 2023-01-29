@@ -25,7 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         System.out.println("PrincipalDetailsService의 loadUserByUsername()");
 
 
-        Member member = memberRepository.findByUsername(username).orElse(null);
+        Member member = memberRepository.findByUsername(username).orElseThrow();
 
         MemberDto dto = MemberDto.builder()
                 .username(member.getUsername())

@@ -4,26 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
     <title>Sign Up Form by Colorlib</title>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 </head>
 <body>
+
 <div class="main">
 
     <!-- Sign up form -->
     <section class="signup">
         <div class="container">
             <div class="signup-content">
-
+                <div class="signup-image">
+                    <a href="/login" class="signup-image-link">이미 회원이신가요?</a>
+                </div>
                 <div class="signup-form">
-                    <h2 class="form-title">로그인</h2>
-                    <form method="POST" class="register-form" id="register-form">
+                    <h2 class="form-title">회원가입</h2>
+                    <form id="mainForm" method="POST" class="register-form">
                         <div class="form-group">
                             <label for="username"><i class="zmdi zmdi-account material-icons-name"></i></label>
-                            <input type="text" name="username" id="username" placeholder="Id"/>
+                            <input id="username" type="text" name="username" placeholder="Id"/>
+                        </div>
+                        <div class="form-group">
+                            <label for="nickname"><i class="zmdi zmdi-nickname"></i></label>
+                            <input type="text" name="nickname" id="nickname" placeholder="nickname"/>
                         </div>
                         <div class="form-group">
                             <label for="password"><i class="zmdi zmdi-lock"></i></label>
@@ -31,61 +37,41 @@
                         </div>
 
                         <div class="form-group form-button">
-                            <input type="button" name="signup" id="signup" class="form-submit" onclick="login()" value="로그인"/>
-
+                            <input type="button" name="signup" id="signup" class="form-submit" onclick="join();" value="가입"/>
                         </div>
                     </form>
                 </div>
-                class="signup-image"
-                <div>
-                    <a href="/joinForm">계정이 없으신가요?</a> </br>
-                    <a href="/oauth2/authorization/google">구글 로그인</a>
-                </div>
-
             </div>
         </div>
     </section>
 </div>
+
+<!-- JS -->
 <script src="vendor/jquery/jquery.min.js"></script>
 <script src="js/main.js"></script>
 </body>
 <script>
-    function login(){
+    function join(){
+
         var data = {
             username: $('#username').val(),
+            nickname: $('#nickname').val(),
             password: $('#password').val()
         };
 
         $.ajax({
             type: 'POST',
-            url: '/login',
+            url: 'api/v1/join',
+            dataType: 'text',
             contentType:'application/json; charset=utf-8',
             data: JSON.stringify(data),
-        }).done(function(data,status,xhr){
-            let jwtToken = xhr.getResponseHeader('Authorization');
-            localStorage.setItem("Authorization", jwtToken);
-            location.href = "/";
+        }).done(function(res){
+            alert("회원 가입 성공");
+            location.href = "/login";
         }).fail(function (error) {
-            alert("존재하지 않는 회원입니다.");
+            alert("이미 존재하는 회원입니다.");
+            $("#username").focus();
         });
     }
 </script>
 </html>
-<!--<!DOCTYPE html>-->
-<!--<html lang="en">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <title>로그인 페이지</title>-->
-<!--</head>-->
-<!--<body>-->
-<!--<h1>로그인 페이지</h1>-->
-<!--<hr/>-->
-<!--<form action="/login"method="post">-->
-<!--    <input type="text"name="username"placeholder="Username"/> <br/>-->
-<!--    <input type="password"name="password"placeholder="Password"/> <br/>-->
-<!--    <button>로그인</button>-->
-<!--</form>-->
-<!--<a href="/joinForm">회원가입을 아직 하지 않으셨나요?</a> <br/>-->
-<!--<a href="/oauth2/authorization/google">구글 로그인</a>-->
-<!--</body>-->
-<!--</html>-->

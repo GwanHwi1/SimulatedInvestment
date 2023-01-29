@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -35,7 +36,9 @@ import java.util.WeakHashMap;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 @RequiredArgsConstructor
-public class SecurityConfig extends WebSecurityConfigurerAdapter{
+public class SecurityConfig {
+
+    private final AuthenticationConfiguration authenticationConfiguration;
 
     private final CustomOAuth2UserService customOAuth2UserService;
 
@@ -43,34 +46,42 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 
     private final MemberRepository memberRepository;
 
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring()
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web
+                .ignoring()
                 .antMatchers("/css/**", "/js/**", "/img/**",
-                          "/lib/**", "/favicon.ico", "/h2-console/**", "/errorPage");
+                        "/lib/**", "/favicon.ico", "/h2-console/**", "/errorPage");
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .addFilter(corsFilter)
-                .formLogin().disable()
-                .httpBasic().disable()
-                .addFilter(new JwtAuthenticationFilter(authenticationManager()))
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberRepository))
-                .authorizeRequests()
-                .antMatchers("/user/**")
-                .access("hasRole('USER') or hasRole('ADMIN')")
-                .antMatchers("/admin/**")
-                .access("hasRole('ADMIN')")
-                .anyRequest().permitAll()
-                .and()
-                .oauth2Login()
-                .loginPage("/loginForm")
-                .userInfoEndpoint()
-                .userService(customOAuth2UserService);
+    @Bean
+    public AuthenticationManager authenticationManager() throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+         return http.csrf().disable()
+                 .addFilter(corsFilter)
+                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                 .and()
+                 .formLogin().disable()
+                 .httpBasic().disable()
+                 .addFilter(new JwtAuthenticationFilter(authenticationManager()))
+                 .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberRepository))
+                 .authorizeRequests()
+                 .antMatchers("/api/v1/user/**")
+                 .access("hasRole('USER') or hasRole('ADMIN')")
+                 .antMatchers("/api/v1/admin/**")
+                 .access("hasRole('ADMIN')")
+                 .anyRequest().permitAll()
+                 .and()
+                 .build();
+//                .and()
+//                .oauth2Login()
+//                .loginPage("/login")
+//                .userInfoEndpoint()
+//                .userService(customOAuth2UserService);
 
     }
 
