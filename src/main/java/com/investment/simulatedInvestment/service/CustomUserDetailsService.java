@@ -22,10 +22,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        System.out.println("PrincipalDetailsService의 loadUserByUsername()");
+        System.out.println("로그인 중");
 
 
-        Member member = memberRepository.findByUsername(username).orElse(null);
+        Member member = memberRepository.findByUsername(username).orElseThrow();
 
         MemberDto dto = MemberDto.builder()
                 .username(member.getUsername())

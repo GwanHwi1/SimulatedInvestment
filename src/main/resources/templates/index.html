@@ -1,31 +1,35 @@
-<!--회원가입 페이지-->
-<!--signup.html-->
 <!DOCTYPE html>
-<!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<!--<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+위의 태그는 REST API 사용 시 사용 불가-->
+<html lang="en">
 <head>
+
+  <head>
     <meta charset="UTF-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Title</title>
+  </head>
+
 </head>
 <body>
-<form method="post" action="/join">
-    <div class="container">
-        <h1>회원가입</h1>
-        <div class="form-group">
-            <label for="inputUsername">userId</label>
-            <input type="text" class="form-control" id="inputUsername" name="username" placeholder="사용자 아이디">
-        </div>
-        <div class="form-group">
-            <label for="inputNickname">userName</label>
-            <input type="text" class="form-control" id="inputNickname" name="nickname" placeholder="사용자 이름">
-        </div>
-        <div class="form-group">
-            <label for="inputPassword">password</label>
-            <input type="password" class="form-control" id="inputPassword" name="password" placeholder="사용자 비밀번호">
-        </div>
-        <button type="submit" class="btn btn-primary">가입 완료.</button>
-    </div>
-</form>
+<div class="container">
+  <h2>Main Page</h2>
+  <button type="button" class="btn btn-primary" onclick="login();">로그인</button>
+  <button type="button" class="btn btn-primary" onclick="join();">회원가입</button>
+  <button type="button" class="btn btn-primary" onclick="authorization();">프로필</button>
+</div>
 
 </body>
+<script>
+  function login(){
+    location.href = "/login";
+  }
+  function join(){
+    location.href = "/join";
+  }
+  function authorization(){
+    location.href = "/myprofile";
+  }
+</script>
 </html>

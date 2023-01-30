@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private MemberRepository memberRepository;
@@ -33,23 +32,27 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        String jwtHeader = request.getHeader("Authorization");
+        String jwtHeader = request.getHeader(JwtProperties.HEADER_STRING);
 
-        if(jwtHeader == null || !jwtHeader.startsWith("Bearer")){
+
+        if(jwtHeader == null || !jwtHeader.startsWith(JwtProperties.TOKEN_PREFIX)){
             chain.doFilter(request, response);
             return;
         }
 
-        String jwtToken = request.getHeader("Authorization").replace("Bearer ", "");
+        System.out.println("jwtHeader: " + jwtHeader);
+
+        String jwtToken = request.getHeader(JwtProperties.HEADER_STRING).replace(JwtProperties.TOKEN_PREFIX, "");
 
         String username =
-                JWT.require(Algorithm.HMAC512("Gwan")).build().verify(jwtToken).getClaim("username").asString();
+                JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(jwtToken).getClaim("username").asString();
 
         if(username != null) {
             System.out.println("username 정상");
             Member userEntity = memberRepository.findByUsername(username).orElse(null);
 
-            System.out.println("userEntity: "+ userEntity.getUsername());
+            System.out.println("userEntity: " + userEntity.getUsername());
+            System.out.println("Role: "+userEntity.getRole().toString());
             MemberDto dto = MemberDto.builder()
                     .username(userEntity.getUsername())
                     .nickname(userEntity.getNickname())
@@ -65,8 +68,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             System.out.println("==============================================================");
-
-            chain.doFilter(request, response);
         }
+
+        chain.doFilter(request, response);
     }
 }
