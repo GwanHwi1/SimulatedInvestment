@@ -1,12 +1,18 @@
 package com.investment.simulatedInvestment.controller;
 
 import com.investment.simulatedInvestment.config.security.CustomUserDetails;
+import com.investment.simulatedInvestment.dto.LoginDto;
 import com.investment.simulatedInvestment.dto.MemberDto;
+import com.investment.simulatedInvestment.dto.Response;
+import com.investment.simulatedInvestment.dto.TokenRequestDto;
 import com.investment.simulatedInvestment.entity.Member;
 import com.investment.simulatedInvestment.repository.MemberRepository;
+import com.investment.simulatedInvestment.service.Helper;
 import com.investment.simulatedInvestment.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
@@ -20,16 +26,11 @@ public class RestApiController {
 
     private final MemberRepository memberRepository;
     private final MemberService memberService;
+    private final Response response;
 
     @GetMapping("/home")
     public String home() {
         return "<h1>home</h1>";
-    }
-
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "logout";
     }
 
     @GetMapping("/user")
@@ -47,10 +48,27 @@ public class RestApiController {
         return memberRepository.findAll();
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginDto loginDto,Errors errors){
+        if (errors.hasErrors()) {
+            return response.invalidFields(Helper.refineErrors(errors));
+        }
+        return memberService.login(loginDto);
+    }
+
     @PostMapping("/join")
     public String join(@RequestBody MemberDto user) {
         memberService.createUser(user);
         return "회원가입완료";
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody TokenRequestDto logout, Errors errors) {
+        // validation check
+        if (errors.hasErrors()) {
+            return response.invalidFields(Helper.refineErrors(errors));
+        }
+        return memberService.logout(logout);
     }
 
 //    @GetMapping("/api/user")

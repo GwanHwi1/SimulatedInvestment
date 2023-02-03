@@ -1,15 +1,19 @@
 package com.investment.simulatedInvestment.config.security;
 
 import com.investment.simulatedInvestment.common.Role;
-import com.investment.simulatedInvestment.config.security.jwt.JwtAuthenticationFilter;
-import com.investment.simulatedInvestment.config.security.jwt.JwtAuthorizationFilter;
+import com.investment.simulatedInvestment.config.security.jwt.JwtFilter;
+import com.investment.simulatedInvestment.config.security.jwt.JwtSecurityConfig;
+import com.investment.simulatedInvestment.config.security.jwt.TokenProvider;
 import com.investment.simulatedInvestment.handler.CustomAccessDeniedHandler;
 import com.investment.simulatedInvestment.handler.CustomAuthenticationEntryPoint;
 import com.investment.simulatedInvestment.repository.MemberRepository;
 import com.investment.simulatedInvestment.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
+import net.bytebuddy.asm.Advice;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -28,11 +32,12 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CorsFilter;
 
 import java.util.WeakHashMap;
 
-
+@Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 @RequiredArgsConstructor
@@ -42,9 +47,14 @@ public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
 
+    private final TokenProvider tokenProvider;
+
+    private final RedisTemplate redisTemplate;
+
     private final CorsFilter corsFilter;
 
     private final MemberRepository memberRepository;
+
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -61,14 +71,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-         return http.csrf().disable()
+         http.csrf().disable()
                  .addFilter(corsFilter)
                  .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                  .and()
                  .formLogin().disable()
                  .httpBasic().disable()
-                 .addFilter(new JwtAuthenticationFilter(authenticationManager()))
-                 .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberRepository))
                  .authorizeRequests()
                  .antMatchers("/api/v1/user/**")
                  .access("hasRole('USER') or hasRole('ADMIN')")
@@ -76,12 +84,13 @@ public class SecurityConfig {
                  .access("hasRole('ADMIN')")
                  .anyRequest().permitAll()
                  .and()
-                 .build();
+                 .apply(new JwtSecurityConfig(tokenProvider, redisTemplate));
 //                .and()
 //                .oauth2Login()
 //                .loginPage("/login")
 //                .userInfoEndpoint()
 //                .userService(customOAuth2UserService);
+        return http.build();
 
     }
 
