@@ -58,7 +58,7 @@ public class MemberService {
         TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
 
         redisTemplate.opsForValue().set("RT:" + authentication.getName(), tokenDto.getRefreshToken(),
-                tokenDto.getAccessTokenExpireIn(),
+                tokenDto.getRefreshTokenExpiresIn(),
                 TimeUnit.MILLISECONDS);
 
         if (member.getRole() == Role.USER) {
@@ -66,8 +66,9 @@ public class MemberService {
         } else{
             tokenDto.setInfo(member.getRole().toString()); //admin일시 admin tokenDto에 저장
         }
-
+        System.out.println(tokenDto);
         return response.success(tokenDto, "로그인에 성공", HttpStatus.OK);
+
     }
 
     public ResponseEntity<?> reissue(TokenRequestDto reissue) {

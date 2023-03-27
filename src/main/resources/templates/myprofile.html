@@ -20,7 +20,7 @@
     contentType:'application/json; charset=utf-8',
     beforeSend: function (xhr) {
       xhr.setRequestHeader("Content-type","application/json");
-      xhr.setRequestHeader("Authorization", localStorage.getItem("Authorization"));
+      xhr.setRequestHeader("Authorization", localStorage.getItem("auth"));
     },
   }).done(function(data,status,xhr) {
     $("#profile").html("사용자의 ID는 " + data.user.username + "입니다.<br>10분뒤에 토큰이 만료됩니다.");

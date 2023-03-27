@@ -58,12 +58,12 @@
 
         $.ajax({
             type: 'POST',
-            url: '/login',
+            url: 'api/v1/login',
             contentType:'application/json; charset=utf-8',
             data: JSON.stringify(data),
         }).done(function(data,status,xhr){
-            let jwtToken = xhr.getResponseHeader('Authorization');
-            localStorage.setItem("Authorization", jwtToken);
+            let jwtToken = xhr.getResponseHeader('auth');
+            localStorage.setItem("auth", jwtToken);
             location.href = "/";
         }).fail(function (error) {
             alert("존재하지 않는 회원입니다.");
