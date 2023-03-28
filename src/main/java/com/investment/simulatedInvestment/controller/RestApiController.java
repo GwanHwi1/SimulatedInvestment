@@ -71,6 +71,15 @@ public class RestApiController {
         return memberService.logout(logout);
     }
 
+    @PostMapping("/reissue")
+    public ResponseEntity<?> reissue(@RequestBody TokenRequestDto reissue, Errors errors) {
+        //validation check
+        if (errors.hasErrors()) {
+            return response.invalidFields(Helper.refineErrors(errors));
+        }
+        System.out.println(reissue.getAccessToken());
+        return memberService.reissue(reissue);
+    }
 //    @GetMapping("/api/user")
 //    public @ResponseBody String user(Authentication authentication){
 //        CustomUserDetails custom =(CustomUserDetails) authentication.getPrincipal();
