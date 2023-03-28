@@ -1,7 +1,6 @@
 package com.investment.simulatedInvestment.service;
 
 import com.investment.simulatedInvestment.common.Role;
-import com.investment.simulatedInvestment.config.security.CustomUserDetails;
 import com.investment.simulatedInvestment.config.security.jwt.TokenProvider;
 import com.investment.simulatedInvestment.dto.*;
 import com.investment.simulatedInvestment.entity.Member;
@@ -15,12 +14,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -67,7 +64,7 @@ public class MemberService {
             tokenDto.setInfo(member.getRole().toString()); //admin일시 admin tokenDto에 저장
         }
         System.out.println(tokenDto);
-        return response.success(tokenDto, "로그인에 성공", HttpStatus.OK);
+        return response.success(tokenDto.getAccessToken(), "로그인에 성공", HttpStatus.OK);
 
     }
 
@@ -96,7 +93,7 @@ public class MemberService {
                 .set("RT:" + authentication.getName(), tokenDto.getRefreshToken(),
                         tokenDto.getRefreshTokenExpiresIn(), TimeUnit.MILLISECONDS);
 
-        return response.success(tokenDto, "토큰 정보가 갱신되었습니다.", HttpStatus.OK);
+        return response.success(tokenDto.getAccessToken(), "토큰 정보가 갱신되었습니다.", HttpStatus.OK);
     }
 
     public ResponseEntity<?> logout(TokenRequestDto logout) {
