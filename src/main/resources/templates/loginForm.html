@@ -38,7 +38,7 @@
                 </div>
                 class="signup-image"
                 <div>
-                    <a href="/joinForm">계정이 없으신가요?</a> </br>
+                    <a href="/join">계정이 없으신가요?</a> </br>
                     <a href="/oauth2/authorization/google">구글 로그인</a>
                 </div>
 
@@ -51,7 +51,7 @@
 </body>
 <script>
     function login(){
-        var data = {
+        const data = {
             username: $('#username').val(),
             password: $('#password').val()
         };
@@ -62,9 +62,10 @@
             contentType:'application/json; charset=utf-8',
             data: JSON.stringify(data),
         }).done(function(data,status,xhr){
-            let jwtToken = xhr.getResponseHeader('auth');
-            localStorage.setItem("auth", jwtToken);
-            location.href = "/";
+            const accessToken = JSON.parse(xhr.responseText);
+            console.log(xhr);
+            document.cookie = "accessToken=" + accessToken.data
+            // location.href = "/";
         }).fail(function (error) {
             alert("존재하지 않는 회원입니다.");
         });
