@@ -1,20 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-
-  <head>
     <meta charset="UTF-8">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <title>Title</title>
-  </head>
-
+    <title>Document</title>
 </head>
 <body>
 <div id="profile">
-  <h1> myprofile </h1>
+    <h1> myprofile </h1>
+    <button onclick="reissue()">reissue</button>
 </div>
-</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js%22%3E"/>
 <script>
+    function reissue() {
+        $.post("/api/v1/reissue", {
+            accessToken: getCookie("access_token"),
+            refreshToken: getCookie("refresh_token")
+        }, function (data) {
+            console.log(data);
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            console.error(textStatus, errorThrown);
+        });
+    }
 
+    // 쿠키에서 특정 이름(name)의 값을 가져오는 함수입니다.
+    function getCookie(name) {
+        const value = "; " + document.cookie;
+        const parts = value.split("; " + name + "=");
+        if (parts.length === 2) {
+            return parts.pop().split(";").shift();
+        }
+    }
 </script>
+</body>
 </html>
