@@ -2,8 +2,6 @@ package com.investment.simulatedInvestment.config.security.jwt;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,23 +21,22 @@ import java.util.Arrays;
 @Slf4j
 public class JwtFilter extends OncePerRequestFilter {
 
-    public static final String AUTHORIZATION_HEADER = "auth";
-    public static final String BEARER_PREFIX = "Bearer ";
+    public static final String AUTHORIZATION_ACCESS = "accessToken";
     private final TokenProvider tokenProvider;
     private final RedisTemplate redisTemplate;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+        String accessToken = resolveToken(request);
 
-        String jwt = resolveToken(request);
-        log.info("jwt 토큰 = {}   {}", jwt, request.getRequestURI());
+        log.info("jwt 토큰 = {}   {}", accessToken, request.getRequestURI());
 
-        if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
+        if (StringUtils.hasText(accessToken) && tokenProvider.validateToken(accessToken)) {
             /*1. Redis 에 해당 accessToken logout 여부 확인 */
-            String isLogout = (String) redisTemplate.opsForValue().get(jwt);
+            String isLogout = (String) redisTemplate.opsForValue().get(accessToken);
             if (ObjectUtils.isEmpty(isLogout)) {
                 /*2. 토큰이 유효할 경우 토큰에서 Authentication 객체를 가지고 와서 SecurityContext 에 저장 */
-                Authentication authentication = tokenProvider.getAuthentication(jwt);
+                Authentication authentication = tokenProvider.getAuthentication(accessToken);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
@@ -48,14 +45,13 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     public String resolveToken(HttpServletRequest request) {
-        /*1. 헤더에서 토큰을 꺼냄*/
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+        if(request.getCookies() == null) return null;
 
-        /*2. 토큰이 담겨 있을 시, 앞의 "Bearer " 제거*/
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-            return bearerToken.substring(7);
-        }
+        Cookie accessCookie = Arrays.stream(request.getCookies())
+                .filter(cookie -> AUTHORIZATION_ACCESS.equals(cookie.getName()))
+                .findFirst()
+                .orElse(null);
 
-        return null;
+        return accessCookie.getValue();
     }
 }
