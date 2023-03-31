@@ -8,7 +8,9 @@
     <title>Sign Up Form by Colorlib</title>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="path/to/your/javascript/file.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 </head>
 <body>
 <div class="main">
@@ -50,6 +52,7 @@
 <script src="js/main.js"></script>
 </body>
 <script>
+
     function login(){
         const data = {
             username: $('#username').val(),
@@ -62,10 +65,25 @@
             contentType:'application/json; charset=utf-8',
             data: JSON.stringify(data),
         }).done(function(data,status,xhr){
-            const accessToken = JSON.parse(xhr.responseText);
-            console.log(xhr);
-            document.cookie = "accessToken=" + accessToken.data
-            // location.href = "/";
+            const {
+                accessToken,
+                refreshToken,
+                refreshTokenExpiresIn,
+                accessTokenExpireIn
+            } = data.data;
+            // refreshToken 쿠키 설정
+            $.cookie("refreshToken", refreshToken, {
+                path: "/", // 모든 페이지에서 쿠키 사용
+                expires: 365, // 쿠키의 만료 시간을 일 단위로 설정, 약 1년
+            });
+
+            // accessToken 쿠키 설정
+            $.cookie("accessToken", accessToken, {
+                path: "/", // 모든 페이지에서 쿠키 사용
+                expires: (accessTokenExpireIn / (60 * 60 * 24)), // 쿠키의 만료 시간을 일 단위로 설정
+            });
+
+            location.href = "/";
         }).fail(function (error) {
             alert("존재하지 않는 회원입니다.");
         });

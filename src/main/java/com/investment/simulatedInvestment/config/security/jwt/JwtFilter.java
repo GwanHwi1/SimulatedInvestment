@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -45,13 +46,11 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     public String resolveToken(HttpServletRequest request) {
-        if(request.getCookies() == null) return null;
-
-        Cookie accessCookie = Arrays.stream(request.getCookies())
-                .filter(cookie -> AUTHORIZATION_ACCESS.equals(cookie.getName()))
-                .findFirst()
+        return Optional.ofNullable(request.getCookies())
+                .flatMap(cookies -> Arrays.stream(cookies)
+                        .filter(cookie -> AUTHORIZATION_ACCESS.equals(cookie.getName()))
+                        .findFirst()
+                        .map(Cookie::getValue))
                 .orElse(null);
-
-        return accessCookie.getValue();
     }
 }

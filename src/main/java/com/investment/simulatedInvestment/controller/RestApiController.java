@@ -33,15 +33,6 @@ public class RestApiController {
         return "<h1>home</h1>";
     }
 
-    @GetMapping("/user")
-    public CustomUserDetails user(Authentication authentication) {
-        CustomUserDetails principal = (CustomUserDetails) authentication.getPrincipal();
-        System.out.println("principal : "+principal.getUser().getUsername());
-        System.out.println("principal : "+principal.getUser().getPassword());
-
-        return principal;
-    }
-
     // 어드민이 접근 가능
     @GetMapping("/admin/users")
     public List<Member> users(){
@@ -78,14 +69,16 @@ public class RestApiController {
             return response.invalidFields(Helper.refineErrors(errors));
         }
         System.out.println(reissue.getAccessToken());
+        System.out.println(reissue.getRefreshToken());
         return memberService.reissue(reissue);
     }
-//    @GetMapping("/api/user")
-//    public @ResponseBody String user(Authentication authentication){
-//        CustomUserDetails custom =(CustomUserDetails) authentication.getPrincipal();
-//        System.out.println("authentication: "+ custom.getUsername());
-//        return "user";
-//    }
+    @GetMapping("/user")
+    public @ResponseBody String myprofile(Authentication authentication){
+        CustomUserDetails custom =(CustomUserDetails) authentication.getPrincipal();
+        System.out.println("authentication: "+ custom.getUsername());
+        return "myprofile";
+    }
+
 //
 //    @GetMapping("/api/user/a")
 //    public String users(){
