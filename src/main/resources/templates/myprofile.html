@@ -1,35 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Document</title>
+  <title>Profile</title>
 </head>
 <body>
 <div id="profile">
-    <h1> myprofile </h1>
-    <button onclick="reissue()">reissue</button>
+  <h1>My Profile</h1>
+  <button onclick="reissue()">Reissue</button>
 </div>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js%22%3E"/>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    function reissue() {
-        $.post("/api/v1/reissue", {
-            accessToken: getCookie("access_token"),
-            refreshToken: getCookie("refresh_token")
-        }, function (data) {
-            console.log(data);
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            console.error(textStatus, errorThrown);
-        });
-    }
+  function reissue() {
+    var accessToken = getCookie("accessToken");
+    var refreshToken = getCookie("refreshToken");
+    $.ajax({
+      url: "/api/v1/reissue",
+      type: "POST",
+      data: JSON.stringify({accessToken: accessToken, refreshToken: refreshToken}),
+      contentType: "application/json",
+      success: function(data) {
+        console.log(data);
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        console.error(textStatus, errorThrown);
+      }
+    });
+  }
 
-    // 쿠키에서 특정 이름(name)의 값을 가져오는 함수입니다.
-    function getCookie(name) {
-        const value = "; " + document.cookie;
-        const parts = value.split("; " + name + "=");
-        if (parts.length === 2) {
-            return parts.pop().split(";").shift();
-        }
+  // 쿠키에서 특정 이름(name)의 값을 가져오는 함수입니다.
+  function getCookie(name) {
+    const value = "; " + document.cookie;
+    const parts = value.split("; " + name + "=");
+    if (parts.length === 2) {
+      return parts.pop().split(";").shift();
     }
+  }
 </script>
 </body>
 </html>
