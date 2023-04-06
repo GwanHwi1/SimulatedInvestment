@@ -1,6 +1,8 @@
 package com.investment.simulatedInvestment.dto;
 
+import com.investment.simulatedInvestment.common.Role;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Setter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

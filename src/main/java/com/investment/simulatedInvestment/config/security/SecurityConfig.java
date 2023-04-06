@@ -3,8 +3,10 @@ package com.investment.simulatedInvestment.config.security;
 import com.investment.simulatedInvestment.config.security.jwt.JwtSecurityConfig;
 import com.investment.simulatedInvestment.config.security.jwt.TokenProvider;
 import com.investment.simulatedInvestment.handler.CustomAccessDeniedHandler;
+import com.investment.simulatedInvestment.handler.CustomAuthenticationEntryPoint;
 import com.investment.simulatedInvestment.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -35,6 +37,10 @@ public class SecurityConfig {
 
     private final CorsFilter corsFilter;
 
+    private final CustomAccessDeniedHandler accessDeniedHandler;
+
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -63,6 +69,9 @@ public class SecurityConfig {
                  .antMatchers("/api/v1/admin/**")
                  .access("hasRole('ADMIN')")
                  .anyRequest().permitAll()
+                 .and()
+                 .exceptionHandling().accessDeniedHandler(accessDeniedHandler)
+                 .authenticationEntryPoint(authenticationEntryPoint)
                  .and()
                  .apply(new JwtSecurityConfig(tokenProvider, redisTemplate));
         return http.build();
