@@ -14,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -33,6 +34,8 @@ public class MemberService {
     private final Response response;
     private final TokenProvider tokenProvider;
 
+    private final PasswordEncoder passwordEncoder;
+
     @Transactional
     public Member createUser(MemberDto dto) {
         Member encoding = Member.builder()
@@ -48,6 +51,9 @@ public class MemberService {
         Member member = memberRepository.findByUsername(loginDto.getUsername()).orElse(null);
         if (member == null) {
             return response.fail("ID 또는 패스워드를 확인하세요", HttpStatus.BAD_REQUEST);
+        }
+        else if (!passwordEncoder.matches(loginDto.getPassword(), member.getPassword())) {
+            return response.fail("아이디 또는 비밀번호를 잘못 입력하였습니다.", HttpStatus.BAD_REQUEST);
         }
         UsernamePasswordAuthenticationToken authenticationToken = loginDto.toAuthentication();
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
